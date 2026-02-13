@@ -6,9 +6,11 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import HomePage from "../pages/public/HomePage";
 import BookingPage from "../pages/public/BookingPage";
 import LoginPage from "../pages/admin/LoginPage";
+import DashboardPage from "../pages/admin/DashboardPage";
 import LeadsPage from "../pages/admin/LeadsPage";
 import AvailabilityPage from "../pages/admin/AvailabilityPage";
 import VisitsPage from "../pages/admin/VisitsPage";
+import ChatPage from "../pages/admin/ChatPage";
 
 function ErrorBoundary() {
   const error = useRouteError() as Error & { status?: number };
@@ -53,11 +55,11 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          { index: true, element: <div>Painel — em breve</div> },
+          { index: true, element: <DashboardPage /> },
           { path: "leads", element: <LeadsPage /> },
           { path: "visits", element: <VisitsPage /> },
           { path: "availability", element: <AvailabilityPage /> },
-          { path: "chat", element: <div>Chat — em breve</div> },
+          { path: "chat", element: <ChatPage /> },
         ],
       },
     ],
