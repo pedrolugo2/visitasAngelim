@@ -1,0 +1,22 @@
+{
+  "name": "@visitas-angelim/functions",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@visitas-angelim/shared": "*",
+    "firebase-admin": "^12",
+    "firebase-functions": "^6"
+  },
+  "devDependencies": {
+    "typescript": "^5.5"
+  },
+  "engines": {
+    "node": "22"
+  }
+}

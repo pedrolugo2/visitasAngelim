@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if the request is from an authenticated admin
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Units: public read, admin write
+    match /units/{unitId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Availability slots: public read (bookable only), admin full access
+    match /availability_slots/{slotId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Visits: public create, admin full access
+    match /visits/{visitId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Leads: admin only
+    match /leads/{leadId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Admins: admin only
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Chat logs: public create, admin read
+    match /chat_logs/{logId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Chat FAQs: public read, admin write
+    match /chat_faqs/{faqId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

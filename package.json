@@ -1,0 +1,25 @@
+{
+  "name": "visitas-angelim",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/shared",
+    "packages/functions",
+    "packages/frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w packages/frontend",
+    "build": "npm run build -w packages/shared && npm run build -w packages/functions && npm run build -w packages/frontend",
+    "build:shared": "npm run build -w packages/shared",
+    "build:frontend": "npm run build -w packages/frontend",
+    "build:functions": "npm run build -w packages/functions",
+    "seed": "npx tsx scripts/seed.ts",
+    "emulators": "firebase emulators:start",
+    "emulators:seed": "firebase emulators:start --import=./seed-data --export-on-exit=./seed-data"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13",
+    "tsx": "^4",
+    "typescript": "^5.5"
+  }
+}
