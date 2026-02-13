@@ -2,8 +2,13 @@ import { createBrowserRouter, useRouteError, Link } from "react-router-dom";
 import { Button, Result } from "antd";
 import AdminLayout from "../layouts/AdminLayout";
 import PublicLayout from "../layouts/PublicLayout";
+import ProtectedRoute from "../components/ProtectedRoute";
 import HomePage from "../pages/public/HomePage";
+import BookingPage from "../pages/public/BookingPage";
+import LoginPage from "../pages/admin/LoginPage";
 import LeadsPage from "../pages/admin/LeadsPage";
+import AvailabilityPage from "../pages/admin/AvailabilityPage";
+import VisitsPage from "../pages/admin/VisitsPage";
 
 function ErrorBoundary() {
   const error = useRouteError() as Error & { status?: number };
@@ -32,19 +37,29 @@ const router = createBrowserRouter([
     errorElement: <ErrorBoundary />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "agendar", element: <div style={{ padding: 48, textAlign: "center" }}>Agendamento de visitas — em breve</div> },
+      { path: "agendar", element: <BookingPage /> },
     ],
+  },
+  {
+    path: "/admin/login",
+    element: <LoginPage />,
+    errorElement: <ErrorBoundary />,
   },
   {
     path: "/admin",
     element: <AdminLayout />,
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: <div>Painel — em breve</div> },
-      { path: "leads", element: <LeadsPage /> },
-      { path: "visits", element: <div>Visitas — em breve</div> },
-      { path: "availability", element: <div>Disponibilidade — em breve</div> },
-      { path: "chat", element: <div>Chat — em breve</div> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { index: true, element: <div>Painel — em breve</div> },
+          { path: "leads", element: <LeadsPage /> },
+          { path: "visits", element: <VisitsPage /> },
+          { path: "availability", element: <AvailabilityPage /> },
+          { path: "chat", element: <div>Chat — em breve</div> },
+        ],
+      },
     ],
   },
 ]);

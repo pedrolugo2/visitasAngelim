@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? "demo-key",
@@ -14,6 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const functions = getFunctions(app);
 
 // Connect to emulators in development (guard against HMR re-connections)
 if (import.meta.env.DEV) {
@@ -24,6 +26,7 @@ if (import.meta.env.DEV) {
       connectAuthEmulator(auth, "http://localhost:9099", {
         disableWarnings: true,
       });
+      connectFunctionsEmulator(functions, "localhost", 5001);
       w.__FIREBASE_EMULATORS_CONNECTED__ = true;
     } catch {
       // Emulators already connected

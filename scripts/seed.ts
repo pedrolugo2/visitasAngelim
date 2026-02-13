@@ -13,15 +13,38 @@
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, Timestamp } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 
 // Point to emulator
 process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
+process.env.FIREBASE_AUTH_EMULATOR_HOST = "localhost:9099";
 
 const app = initializeApp({ projectId: "visitas-angelim" });
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 async function seed() {
   console.log("Seeding Firestore emulator...\n");
+
+  // --- Admin User ---
+  console.log("Creating admin user...");
+  try {
+    const adminUser = await auth.createUser({
+      email: "admin@escolaangelim.com.br",
+      password: "admin123",
+      displayName: "Admin Teste",
+    });
+
+    await db.collection("admins").doc(adminUser.uid).set({
+      email: "admin@escolaangelim.com.br",
+      name: "Admin Teste",
+      createdAt: Timestamp.now(),
+    });
+
+    console.log("  -> admin@escolaangelim.com.br / admin123\n");
+  } catch (err) {
+    console.log("  -> Admin user already exists, skipping...\n");
+  }
 
   // --- Units ---
   console.log("Creating units...");
