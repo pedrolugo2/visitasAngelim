@@ -26,8 +26,8 @@ export default function TeacherAvailabilityPage() {
         teacherName: values.teacherName,
         teacherEmail: values.teacherEmail,
         unitId: values.unitId,
-        availableDates: values.availableDates.map((d: dayjs.Dayjs) =>
-          d.toISOString()
+        availableDates: values.availableDates.map((d: string) =>
+          dayjs(d).toISOString()
         ),
         preferredTimes: values.preferredTimes || [],
         notes: values.notes || "",
@@ -121,7 +121,7 @@ export default function TeacherAvailabilityPage() {
               {Array.from({ length: 30 }, (_, i) => {
                 const date = dayjs().add(i, "day");
                 return (
-                  <Select.Option key={date.format("YYYY-MM-DD")} value={date}>
+                  <Select.Option key={date.format("YYYY-MM-DD")} value={date.format("YYYY-MM-DD")}>
                     {date.format("DD/MM/YYYY (dddd)")}
                   </Select.Option>
                 );
