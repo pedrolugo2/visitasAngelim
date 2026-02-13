@@ -28,3 +28,9 @@ export type {
 } from "./lead";
 
 export type { ChatLog, ChatFaq, ChatParticipantType } from "./chat";
+
+export type {
+  TeacherAvailability,
+  PreferredTime,
+  CreateTeacherAvailabilityData,
+} from "./teacher-availability";

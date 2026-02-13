@@ -11,7 +11,8 @@
   "dependencies": {
     "@visitas-angelim/shared": "*",
     "firebase-admin": "^12",
-    "firebase-functions": "^6"
+    "firebase-functions": "^6",
+    "nodemailer": "^6"
   },
   "devDependencies": {
     "typescript": "^5.5"

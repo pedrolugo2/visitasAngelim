@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Steps, Card, Button, Form, Radio, Space, Typography, Result, message } from "antd";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { httpsCallable } from "firebase/functions";
 import dayjs from "dayjs";
 import { useUnits } from "../../hooks/useUnits";
 import { useAvailableSlots } from "../../features/visits/hooks/useAvailableSlots";
 import BookingForm from "../../features/visits/components/BookingForm";
-import { createVisit } from "../../services/visits.service";
+import { functions } from "../../firebase";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -47,19 +48,37 @@ export default function BookingPage() {
         return;
       }
 
-      await createVisit({
-        ...values,
+      // Call the cloud function to book the visit
+      const bookVisitFn = httpsCallable(functions, "bookVisit");
+      const result = await bookVisitFn({
+        parentName: values.parentName,
+        parentEmail: values.parentEmail,
+        parentPhone: values.parentPhone,
+        childName: values.childName,
+        childAge: values.childAge,
+        childGradeOfInterest: values.childGradeOfInterest,
         unitId: selectedUnit,
         slotId: selectedSlot.id,
-        visitDateTime: selectedSlot.startTime,
-        status: "scheduled",
       });
 
-      setBookingComplete(true);
-      setCurrentStep(3);
-    } catch (err) {
+      if (result.data && (result.data as any).success) {
+        setBookingComplete(true);
+        setCurrentStep(3);
+      } else {
+        message.error("Erro ao agendar visita");
+      }
+    } catch (err: any) {
       if (err && typeof err === "object" && "errorFields" in err) return;
-      message.error("Erro ao agendar visita");
+
+      // Handle Firebase Functions errors
+      const errorMessage = err?.message || "Erro ao agendar visita";
+      if (errorMessage.includes("resource-exhausted")) {
+        message.error("Este horário está lotado. Por favor, escolha outro horário.");
+      } else if (errorMessage.includes("not-found")) {
+        message.error("Horário não encontrado. Por favor, recarregue a página.");
+      } else {
+        message.error("Erro ao agendar visita. Tente novamente.");
+      }
     } finally {
       setSubmitting(false);
     }

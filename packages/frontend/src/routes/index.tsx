@@ -5,6 +5,7 @@ import PublicLayout from "../layouts/PublicLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
 import HomePage from "../pages/public/HomePage";
 import BookingPage from "../pages/public/BookingPage";
+import TeacherAvailabilityPage from "../pages/public/TeacherAvailabilityPage";
 import LoginPage from "../pages/admin/LoginPage";
 import DashboardPage from "../pages/admin/DashboardPage";
 import LeadsPage from "../pages/admin/LeadsPage";
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "agendar", element: <BookingPage /> },
+      { path: "professor-disponibilidade", element: <TeacherAvailabilityPage /> },
     ],
   },
   {
