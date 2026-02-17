@@ -1,15 +1,49 @@
-import * as nodemailer from "nodemailer";
+const SMTP2GO_API_URL = "https://api.smtp2go.com/v3/email/send";
+const SMTP2GO_API_KEY = process.env.SMTP2GO_API_KEY || "";
+const SENDER_EMAIL = process.env.SENDER_EMAIL || "noreply@escolaangelim.com.br";
 
-// Email configuration (use environment variables in production)
-const transporter = nodemailer.createTransporter({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "587"),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER || "noreply@escolaangelim.com.br",
-    pass: process.env.SMTP_PASS || "",
-  },
-});
+interface Smtp2goPayload {
+  api_key: string;
+  sender: string;
+  to: string[];
+  subject: string;
+  html_body: string;
+  text_body?: string;
+}
+
+interface Smtp2goResponse {
+  request_id: string;
+  data: {
+    succeeded: number;
+    failed: number;
+    failures: string[];
+    email_id: string;
+  };
+}
+
+async function sendEmail(payload: Smtp2goPayload): Promise<Smtp2goResponse> {
+  const response = await fetch(SMTP2GO_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "accept": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`SMTP2Go API error (${response.status}): ${errorText}`);
+  }
+
+  const result = (await response.json()) as Smtp2goResponse;
+
+  if (result.data.failed > 0) {
+    throw new Error(`SMTP2Go delivery failures: ${result.data.failures.join(", ")}`);
+  }
+
+  return result;
+}
 
 interface VisitEmailData {
   parentName: string;
@@ -34,11 +68,12 @@ export async function sendVisitConfirmation(data: VisitEmailData): Promise<void>
     minute: "2-digit",
   });
 
-  const mailOptions = {
-    from: '"Escola Angelim" <noreply@escolaangelim.com.br>',
-    to: data.parentEmail,
+  await sendEmail({
+    api_key: SMTP2GO_API_KEY,
+    sender: `Escola Angelim <${SENDER_EMAIL}>`,
+    to: [data.parentEmail],
     subject: "Confirmação de Visita - Escola Angelim",
-    html: `
+    html_body: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -89,9 +124,7 @@ export async function sendVisitConfirmation(data: VisitEmailData): Promise<void>
       </body>
       </html>
     `,
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 }
 
 export async function sendVisitReminder(data: VisitEmailData): Promise<void> {
@@ -107,11 +140,12 @@ export async function sendVisitReminder(data: VisitEmailData): Promise<void> {
     minute: "2-digit",
   });
 
-  const mailOptions = {
-    from: '"Escola Angelim" <noreply@escolaangelim.com.br>',
-    to: data.parentEmail,
+  await sendEmail({
+    api_key: SMTP2GO_API_KEY,
+    sender: `Escola Angelim <${SENDER_EMAIL}>`,
+    to: [data.parentEmail],
     subject: "Lembrete: Sua visita é amanhã! - Escola Angelim",
-    html: `
+    html_body: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -153,7 +187,5 @@ export async function sendVisitReminder(data: VisitEmailData): Promise<void> {
       </body>
       </html>
     `,
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 }

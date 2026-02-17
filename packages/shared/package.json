@@ -2,8 +2,9 @@
   "name": "@visitas-angelim/shared",
   "version": "1.0.0",
   "private": true,
-  "main": "./src/types/index.ts",
-  "types": "./src/types/index.ts",
+  "main": "./dist/types/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": ["dist"],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit"

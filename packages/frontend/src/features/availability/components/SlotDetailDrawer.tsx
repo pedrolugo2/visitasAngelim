@@ -21,6 +21,11 @@ import {
   deleteSlot,
 } from "../../../services/availability.service";
 
+const hourOptions = Array.from({ length: 14 }, (_, i) => {
+  const h = i + 7;
+  return { value: h, label: `${String(h).padStart(2, "0")}:00` };
+});
+
 interface SlotDetailDrawerProps {
   open: boolean;
   slot: AvailabilitySlot | null;
@@ -39,10 +44,14 @@ export default function SlotDetailDrawer({
   useEffect(() => {
     if (open) {
       if (slot) {
+        const start = dayjs(slot.startTime as string);
+        const end = dayjs(slot.endTime as string);
         form.setFieldsValue({
           unitId: slot.unitId,
-          startTime: dayjs(slot.startTime as string),
-          endTime: dayjs(slot.endTime as string),
+          startDate: start,
+          startHour: start.hour(),
+          endDate: end,
+          endHour: end.hour(),
           capacity: slot.capacity,
           isBookable: slot.isBookable,
         });
@@ -57,16 +66,18 @@ export default function SlotDetailDrawer({
     try {
       const values = await form.validateFields();
 
-      // Validate endTime is after startTime
-      if (values.endTime.isBefore(values.startTime)) {
+      const startTime = values.startDate.hour(values.startHour).minute(0).second(0);
+      const endTime = values.endDate.hour(values.endHour).minute(0).second(0);
+
+      if (endTime.isBefore(startTime) || endTime.isSame(startTime)) {
         message.error("Horário de término deve ser após o início");
         return;
       }
 
       const slotData = {
         unitId: values.unitId,
-        startTime: values.startTime.toISOString(),
-        endTime: values.endTime.toISOString(),
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
         capacity: values.capacity,
         isBookable: values.isBookable,
       };
@@ -137,31 +148,51 @@ export default function SlotDetailDrawer({
           />
         </Form.Item>
 
-        <Form.Item
-          name="startTime"
-          label="Início"
-          rules={[{ required: true, message: "Informe o horário de início" }]}
-        >
-          <DatePicker
-            showTime
-            format="DD/MM/YYYY HH:mm"
-            style={{ width: "100%" }}
-            placeholder="Selecione data e hora"
-          />
-        </Form.Item>
+        <Space.Compact style={{ width: "100%" }}>
+          <Form.Item
+            name="startDate"
+            label="Data de início"
+            rules={[{ required: true, message: "Informe a data" }]}
+            style={{ flex: 1 }}
+          >
+            <DatePicker
+              format="DD/MM/YYYY"
+              style={{ width: "100%" }}
+              placeholder="Data"
+            />
+          </Form.Item>
+          <Form.Item
+            name="startHour"
+            label="Hora"
+            rules={[{ required: true, message: "Informe a hora" }]}
+            style={{ width: 120 }}
+          >
+            <Select placeholder="Hora" options={hourOptions} />
+          </Form.Item>
+        </Space.Compact>
 
-        <Form.Item
-          name="endTime"
-          label="Término"
-          rules={[{ required: true, message: "Informe o horário de término" }]}
-        >
-          <DatePicker
-            showTime
-            format="DD/MM/YYYY HH:mm"
-            style={{ width: "100%" }}
-            placeholder="Selecione data e hora"
-          />
-        </Form.Item>
+        <Space.Compact style={{ width: "100%" }}>
+          <Form.Item
+            name="endDate"
+            label="Data de término"
+            rules={[{ required: true, message: "Informe a data" }]}
+            style={{ flex: 1 }}
+          >
+            <DatePicker
+              format="DD/MM/YYYY"
+              style={{ width: "100%" }}
+              placeholder="Data"
+            />
+          </Form.Item>
+          <Form.Item
+            name="endHour"
+            label="Hora"
+            rules={[{ required: true, message: "Informe a hora" }]}
+            style={{ width: 120 }}
+          >
+            <Select placeholder="Hora" options={hourOptions} />
+          </Form.Item>
+        </Space.Compact>
 
         <Form.Item
           name="capacity"

@@ -1,5 +1,5 @@
 import { Layout, Menu } from "antd";
-import { HomeOutlined, CalendarOutlined, GlobalOutlined } from "@ant-design/icons";
+import { HomeOutlined, GlobalOutlined } from "@ant-design/icons";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import ChatWidget from "../features/chat/components/ChatWidget";
 
@@ -14,11 +14,6 @@ export default function PublicLayout() {
       key: "/",
       icon: <HomeOutlined />,
       label: "Início",
-    },
-    {
-      key: "/agendar",
-      icon: <CalendarOutlined />,
-      label: "Agendar Visita",
     },
     {
       key: "website",
@@ -52,15 +47,21 @@ export default function PublicLayout() {
       >
         <div
           style={{
-            color: "#FDF8F0",
-            fontWeight: 700,
-            fontSize: 20,
+            background: "#FDF8F0",
+            borderRadius: 8,
+            padding: "4px 12px",
             marginRight: 32,
             cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
           }}
           onClick={() => navigate("/")}
         >
-          Angelim
+          <img
+            src="/logo.png"
+            alt="Angelim"
+            style={{ height: 40 }}
+          />
         </div>
         <Menu
           theme="dark"

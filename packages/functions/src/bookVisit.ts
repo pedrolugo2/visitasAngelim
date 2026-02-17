@@ -16,7 +16,7 @@ interface BookVisitData {
   slotId: string;
 }
 
-export const bookVisit = onCall(async (request) => {
+export const bookVisit = onCall({ cors: true }, async (request) => {
   const data = request.data as BookVisitData;
 
   // Validate required fields

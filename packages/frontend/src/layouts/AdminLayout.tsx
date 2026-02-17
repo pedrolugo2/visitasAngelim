@@ -60,13 +60,23 @@ export default function AdminLayout() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#FDF8F0",
-            fontWeight: 700,
-            fontSize: 18,
-            letterSpacing: 0.5,
           }}
         >
-          Angelim
+          <div
+            style={{
+              background: "#FDF8F0",
+              borderRadius: 8,
+              padding: "4px 10px",
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            <img
+              src="/logo.png"
+              alt="Angelim"
+              style={{ height: 36 }}
+            />
+          </div>
         </div>
         <Menu
           theme="dark"

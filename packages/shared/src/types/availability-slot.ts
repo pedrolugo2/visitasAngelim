@@ -7,4 +7,5 @@ export interface AvailabilitySlot {
   endTime: TimestampField;
   capacity: number;
   isBookable: boolean;
+  tag?: string;
 }

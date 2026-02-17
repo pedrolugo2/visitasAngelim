@@ -144,6 +144,7 @@ Architect should decide
     *   `endTime`: (timestamp) End time of the availability slot.
     *   `capacity`: (number) Maximum number of visits allowed for this slot.
     *   `isBookable`: (boolean) Whether the slot is currently open for booking.
+    *   `tag`: (string, optional) Label for the slot (e.g., teacher name) to help identify who is available.
 
 **`visits` collection/table:**
 *   **ID:** Auto-generated ID.

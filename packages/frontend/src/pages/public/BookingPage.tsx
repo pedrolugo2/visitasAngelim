@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Steps, Card, Button, Form, Radio, Space, Typography, Result, message } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+
 import { httpsCallable } from "firebase/functions";
 import dayjs from "dayjs";
 import { useUnits } from "../../hooks/useUnits";
@@ -18,13 +17,16 @@ export default function BookingPage() {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
-  const navigate = useNavigate();
+
   const { units } = useUnits();
 
-  // Load slots for next 60 days
-  const startDate = new Date();
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + 60);
+  // Load slots for next 60 days (memoized to avoid re-creating listeners on every render)
+  const [startDate, endDate] = useMemo(() => {
+    const start = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 60);
+    return [start, end] as const;
+  }, []);
 
   const { slots } = useAvailableSlots(selectedUnit || undefined, startDate, endDate);
 
@@ -70,12 +72,20 @@ export default function BookingPage() {
     } catch (err: any) {
       if (err && typeof err === "object" && "errorFields" in err) return;
 
-      // Handle Firebase Functions errors
-      const errorMessage = err?.message || "Erro ao agendar visita";
-      if (errorMessage.includes("resource-exhausted")) {
+      // Handle Firebase Functions errors (code format: "functions/error-code")
+      const code = err?.code || "";
+      const errMessage = err?.message || "";
+
+      if (code.includes("resource-exhausted") || errMessage.includes("resource-exhausted")) {
         message.error("Este horário está lotado. Por favor, escolha outro horário.");
-      } else if (errorMessage.includes("not-found")) {
+      } else if (code.includes("not-found") || errMessage.includes("not-found")) {
         message.error("Horário não encontrado. Por favor, recarregue a página.");
+      } else if (code.includes("invalid-argument") || errMessage.includes("invalid-argument")) {
+        message.error("Dados incompletos. Preencha todos os campos obrigatórios.");
+      } else if (code.includes("failed-precondition") || errMessage.includes("failed-precondition")) {
+        message.error("Este horário não está mais disponível para agendamento.");
+      } else if (code.includes("unavailable") || errMessage.includes("Failed to fetch")) {
+        message.error("Erro de conexão. Verifique sua internet e tente novamente.");
       } else {
         message.error("Erro ao agendar visita. Tente novamente.");
       }
@@ -103,7 +113,13 @@ export default function BookingPage() {
             </div>
           }
           extra={[
-            <Button type="primary" key="home" onClick={() => navigate("/")}>
+            <Button type="primary" key="home" onClick={() => {
+              setBookingComplete(false);
+              setCurrentStep(0);
+              setSelectedUnit(null);
+              setSelectedSlot(null);
+              form.resetFields();
+            }}>
               Voltar ao início
             </Button>,
           ]}
@@ -184,10 +200,6 @@ export default function BookingPage() {
                       <Text>
                         {dayjs(slot.startTime as string).format("HH:mm")} -{" "}
                         {dayjs(slot.endTime as string).format("HH:mm")}
-                      </Text>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {slot.remainingCapacity} {slot.remainingCapacity === 1 ? "vaga" : "vagas"}{" "}
-                        disponível{slot.remainingCapacity === 1 ? "" : "is"}
                       </Text>
                     </Space>
                   </Card>

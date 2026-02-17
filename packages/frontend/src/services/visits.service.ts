@@ -8,7 +8,6 @@ import {
   where,
   orderBy,
   Timestamp,
-  getCountFromServer,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import type { Visit, VisitStatus } from "@visitas-angelim/shared";
@@ -108,13 +107,3 @@ export async function updateVisit(
   await updateDoc(docRef, updateData);
 }
 
-/** Get count of visits for a specific slot (excluding cancelled) */
-export async function getSlotBookingCount(slotId: string): Promise<number> {
-  const q = query(
-    visitsRef,
-    where("slotId", "==", slotId),
-    where("status", "!=", "cancelled")
-  );
-  const snapshot = await getCountFromServer(q);
-  return snapshot.data().count;
-}

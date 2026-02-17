@@ -80,6 +80,14 @@ export default function SlotList() {
       width: 100,
     },
     {
+      title: "Tag",
+      dataIndex: "tag",
+      key: "tag",
+      render: (tag: string | undefined) =>
+        tag ? <Tag color="blue">{tag}</Tag> : null,
+      width: 100,
+    },
+    {
       title: "Status",
       dataIndex: "isBookable",
       key: "isBookable",

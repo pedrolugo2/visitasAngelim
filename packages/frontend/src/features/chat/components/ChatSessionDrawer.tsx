@@ -79,9 +79,13 @@ export default function ChatSessionDrawer({
                       marginBottom: 12,
                     }}
                   >
-                    <Space
-                      align="start"
-                      direction={isParent ? "horizontal" : "horizontal-reverse"}
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: isParent ? "row" : "row-reverse",
+                        alignItems: "flex-start",
+                        gap: 8,
+                      }}
                     >
                       <Avatar
                         size="small"
@@ -113,7 +117,7 @@ export default function ChatSessionDrawer({
                           {dayjs(msg.timestamp as string).format("DD/MM/YYYY HH:mm")}
                         </Text>
                       </div>
-                    </Space>
+                    </div>
                   </div>
                 );
               }}

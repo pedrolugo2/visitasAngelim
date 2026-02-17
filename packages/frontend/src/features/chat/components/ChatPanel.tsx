@@ -103,9 +103,13 @@ export default function ChatPanel({ sessionId }: ChatPanelProps) {
                     marginBottom: 12,
                   }}
                 >
-                  <Space
-                    align="start"
-                    direction={isParent ? "horizontal-reverse" : "horizontal"}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: isParent ? "row-reverse" : "row",
+                      alignItems: "flex-start",
+                      gap: 8,
+                    }}
                   >
                     <Avatar
                       size="small"
@@ -137,7 +141,7 @@ export default function ChatPanel({ sessionId }: ChatPanelProps) {
                         {dayjs(msg.timestamp as string).format("HH:mm")}
                       </Text>
                     </div>
-                  </Space>
+                  </div>
                 </div>
               );
             }}

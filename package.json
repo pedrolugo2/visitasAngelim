@@ -14,6 +14,7 @@
     "build:frontend": "npm run build -w packages/frontend",
     "build:functions": "npm run build -w packages/functions",
     "seed": "npx tsx scripts/seed.ts",
+    "seed:prod": "npx tsx scripts/seed-prod.ts --confirm",
     "emulators": "firebase emulators:start",
     "emulators:seed": "firebase emulators:start --import=./seed-data --export-on-exit=./seed-data"
   },

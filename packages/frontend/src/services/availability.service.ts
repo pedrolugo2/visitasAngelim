@@ -25,6 +25,7 @@ function docToSlot(id: string, data: Record<string, unknown>): AvailabilitySlot 
     endTime: (data.endTime as Timestamp).toDate().toISOString(),
     capacity: data.capacity as number,
     isBookable: data.isBookable as boolean,
+    tag: (data.tag as string) || undefined,
   };
 }
 
@@ -61,13 +62,17 @@ export function subscribeToAvailabilitySlots(
 export async function createSlot(
   data: Omit<AvailabilitySlot, "id">
 ): Promise<string> {
-  const docRef = await addDoc(slotsRef, {
+  const docData: Record<string, unknown> = {
     unitId: data.unitId,
     startTime: Timestamp.fromDate(new Date(data.startTime as string)),
     endTime: Timestamp.fromDate(new Date(data.endTime as string)),
     capacity: data.capacity,
     isBookable: data.isBookable,
-  });
+  };
+  if (data.tag) {
+    docData.tag = data.tag;
+  }
+  const docRef = await addDoc(slotsRef, docData);
   return docRef.id;
 }
 

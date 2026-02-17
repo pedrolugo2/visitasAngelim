@@ -1,3 +1,12 @@
+@font-face {
+  font-family: 'Baar Antropos';
+  src: url('/fonts/BaarAntropos.woff2') format('woff2'),
+       url('/fonts/BaarAntropos.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -9,6 +18,16 @@ body {
   color: #3e2723;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading font — Waldorf-style Baar Antropos */
+h1, h2, h3, h4, h5, h6,
+h1.ant-typography,
+h2.ant-typography,
+h3.ant-typography,
+h4.ant-typography,
+h5.ant-typography {
+  font-family: 'Baar Antropos', 'Segoe UI', sans-serif !important;
 }
 
 /* Scrollbar styling */

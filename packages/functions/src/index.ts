@@ -1,4 +1,7 @@
+import { initializeApp } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
+
+initializeApp();
 
 // Health check endpoint
 export const api = onRequest((req, res) => {

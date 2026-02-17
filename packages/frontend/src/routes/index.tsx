@@ -3,7 +3,6 @@ import { Button, Result } from "antd";
 import AdminLayout from "../layouts/AdminLayout";
 import PublicLayout from "../layouts/PublicLayout";
 import ProtectedRoute from "../components/ProtectedRoute";
-import HomePage from "../pages/public/HomePage";
 import BookingPage from "../pages/public/BookingPage";
 import TeacherAvailabilityPage from "../pages/public/TeacherAvailabilityPage";
 import LoginPage from "../pages/admin/LoginPage";
@@ -39,8 +38,7 @@ const router = createBrowserRouter([
     element: <PublicLayout />,
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: "agendar", element: <BookingPage /> },
+      { index: true, element: <BookingPage /> },
       { path: "professor-disponibilidade", element: <TeacherAvailabilityPage /> },
     ],
   },

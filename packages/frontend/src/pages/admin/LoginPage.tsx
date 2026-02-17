@@ -1,10 +1,54 @@
-import { useState } from "react";
-import { Form, Input, Button, Typography, message, Modal, Card } from "antd";
+import { useState, useEffect } from "react";
+import { Form, Input, Button, Typography, message, Alert, Modal, Card } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 const { Title, Text } = Typography;
+
+/** Map Firebase Auth error codes to user-friendly messages in Portuguese */
+function getAuthErrorMessage(err: unknown): string {
+  const code =
+    err && typeof err === "object" && "code" in err
+      ? (err as { code: string }).code
+      : "";
+
+  switch (code) {
+    case "auth/invalid-credential":
+    case "auth/wrong-password":
+    case "auth/user-not-found":
+      return "E-mail ou senha inválidos.";
+    case "auth/invalid-email":
+      return "Formato de e-mail inválido.";
+    case "auth/user-disabled":
+      return "Esta conta foi desativada. Entre em contato com o administrador.";
+    case "auth/too-many-requests":
+      return "Muitas tentativas de login. Aguarde alguns minutos e tente novamente.";
+    case "auth/network-request-failed":
+      return "Erro de conexão. Verifique sua internet e tente novamente.";
+    default:
+      return "Erro ao realizar login. Tente novamente.";
+  }
+}
+
+function getResetPasswordErrorMessage(err: unknown): string {
+  const code =
+    err && typeof err === "object" && "code" in err
+      ? (err as { code: string }).code
+      : "";
+
+  switch (code) {
+    case "auth/user-not-found":
+    case "auth/invalid-email":
+      return "E-mail não encontrado.";
+    case "auth/too-many-requests":
+      return "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
+    case "auth/network-request-failed":
+      return "Erro de conexão. Verifique sua internet e tente novamente.";
+    default:
+      return "Erro ao enviar e-mail de recuperação. Tente novamente.";
+  }
+}
 
 export default function LoginPage() {
   const [form] = Form.useForm();
@@ -13,15 +57,22 @@ export default function LoginPage() {
   const [resetModalOpen, setResetModalOpen] = useState(false);
   const [resetSubmitting, setResetSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { signIn, resetPassword } = useAuth();
+  const { signIn, resetPassword, error: authError } = useAuth();
+
+  // Show error when user authenticates but is not in the admins collection
+  useEffect(() => {
+    if (authError?.message === "Usuário não autorizado") {
+      message.error("Você não tem permissão para acessar o painel administrativo.");
+    }
+  }, [authError]);
 
   async function handleLogin(values: { email: string; password: string }) {
     setSubmitting(true);
     try {
       await signIn(values.email, values.password);
       navigate("/admin", { replace: true });
-    } catch {
-      message.error("E-mail ou senha inválidos");
+    } catch (err) {
+      message.error(getAuthErrorMessage(err));
     } finally {
       setSubmitting(false);
     }
@@ -32,12 +83,12 @@ export default function LoginPage() {
       const values = await resetForm.validateFields();
       setResetSubmitting(true);
       await resetPassword(values.email);
-      message.success("E-mail de recuperação enviado");
+      message.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
       setResetModalOpen(false);
       resetForm.resetFields();
     } catch (err) {
       if (err && typeof err === "object" && "errorFields" in err) return;
-      message.error("Erro ao enviar e-mail de recuperação");
+      message.error(getResetPasswordErrorMessage(err));
     } finally {
       setResetSubmitting(false);
     }
